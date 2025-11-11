@@ -7,16 +7,21 @@ on:
     paths-ignore:
       - README.md # 忽略文件
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest # 运行环境
     steps:
       # 下载源码，检出仓库并下载里面的代码到runner中，actions/checkout@v2是官方自己的轮子，开箱即用
-      - name: Checkout code
-        uses: actions/checkout@v2 # 检出代码
+      - name: 检出代码
+        uses: actions/checkout@v4
 
       # 打包构建
-      - name: Build
+      - name: 构建打包
         uses: actions/setup-node@master
         with:
           node-version: "20.x" # 指定需要的node版本
@@ -24,12 +29,12 @@ jobs:
       - run: npm run build
 
       # 部署到服务器
-      - name: Deploy to server
+      - name: 部署服务
         uses: peaceiris/actions-gh-pages@v3
         with:
-          branch: gh-pages # 部署分支
+          publish_branch: gh-pages # 部署分支
           publish_dir: ./dist # 部署目录
           github_token: ${{ secrets.CICD_DEMO }} # 令牌
           user_name: ${{ secrets.MY_USERNAME }}
           user_email: ${{ secrets.MY_EMAIL }}
-          commit_message: '自动部署'
+          commit_message: 自动部署
