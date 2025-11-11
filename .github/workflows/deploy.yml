@@ -35,7 +35,7 @@ jobs:
         run: npm run build
 
       - name: 部署到阿里云 OSS
-        uses: manyuanrong/ossutil@v3.0.0
+        uses: manyuanrong/setup-ossutil@v2.0
         with:
           publish_branch: gh-pages # 部署分支（可自定义）
           publish_dir: ./dist # 构建输出目录
