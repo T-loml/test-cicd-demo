@@ -2,10 +2,11 @@ name: Deploy # 部署名称
 
 on:
   push:
-    branches:
-      - main # 部署分支
+    branches: [mian]
     paths-ignore:
       - README.md # 忽略文件
+    pull_request:
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -17,24 +18,44 @@ jobs:
     runs-on: ubuntu-latest # 运行环境
     steps:
       # 下载源码，检出仓库并下载里面的代码到runner中，actions/checkout@v2是官方自己的轮子，开箱即用
-      - name: Checkout code
+      - name: 下载源代码
         uses: actions/checkout@v4 # 检出代码
 
       # 打包构建
-      - name: Build
+      - name: 打包构建
         uses: actions/setup-node@master
         with:
           node-version: "20.x" # 指定需要的node版本
       - run: npm install
       - run: npm run build
 
-      # 部署到服务器
-      - name: Deploy to server
-        uses: peaceiris/actions-gh-pages@v3
-        with:
+    # 部署到阿里云OSS（替换COS部署）
+      - name: 部署到阿里云OSS
+        uses: manyuanrong/ossutil@v3.0.0
+          with:
           publish_branch: gh-pages # 部署分支
           publish_dir: ./dist # 部署目录
-          github_token: ${{ secrets.CICD_DEMO }} # 令牌
-          user_name: ${{ secrets.MY_USERNAME }}
-          user_email: ${{ secrets.MY_EMAIL }}
-          commit_message: 自动部署
+          # 阿里云访问凭证
+          accessKeyId: ${{ secrets.ALY_SECRET_ID }}
+          accessKeySecret: ${{ secrets.ALY_SECRET_KEY }}
+          # OSS配置
+          endpoint: ${{ secrets.ALY_ENDPOINT }}
+          bucket: ${{ secrets.ALY_BUCKET }}
+          clear: true
+          
+      - name: 部署成功，可访问域名
+        run: |
+          echo "🎉 部署成功！"
+          echo "🌐 网站访问地址：http://${{ secrets.OSS_BUCKET }}.${{ secrets.OSS_ENDPOINT }}"
+
+
+      # 部署到服务器
+      # - name: Deploy to server
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     publish_branch: gh-pages # 部署分支
+      #     publish_dir: ./dist # 部署目录
+      #     github_token: ${{ secrets.CICD_DEMO }} # 令牌
+      #     user_name: ${{ secrets.MY_USERNAME }}
+      #     user_email: ${{ secrets.MY_EMAIL }}
+      #     commit_message: 自动部署
