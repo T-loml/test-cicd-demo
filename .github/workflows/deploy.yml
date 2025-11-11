@@ -2,7 +2,8 @@ name: Deploy # 部署名称
 
 on:
   push:
-    branches: [main] # 部署分支
+    branches:
+      - main # 部署分支
     paths-ignore:
       - README.md # 忽略文件
 
@@ -25,6 +26,6 @@ jobs:
       # 部署到服务器
       - name: Deploy to server
         uses: peaceiris/actions-gh-pages@v3
-        with: 
+        with:
           branch: gh-pages # 部署分支
           publish_dir: ./dist # 部署目录
