@@ -27,7 +27,7 @@ jobs:
       - name: Deploy to server
         uses: peaceiris/actions-gh-pages@v3
         with:
-          branch: gh-pages # 部署分支
+          publish_branch: gh-pages # 部署分支
           publish_dir: ./dist # 部署目录
           github_token: ${{ secrets.CICD_DEMO }} # 令牌
           user_name: ${{ secrets.MY_USERNAME }}
