@@ -2,11 +2,13 @@ name: Deploy # 部署名称
 
 on:
   push:
-    branches: [mian]
+    branches:
+      - main
     paths-ignore:
       - README.md # 忽略文件
-    pull_request:
-    branches: [ main ]
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -16,38 +18,37 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest # 运行环境
+
     steps:
-      # 下载源码，检出仓库并下载里面的代码到runner中，actions/checkout@v2是官方自己的轮子，开箱即用
       - name: 下载源代码
-        uses: actions/checkout@v4 # 检出代码
+        uses: actions/checkout@v4
 
-      # 打包构建
-      - name: 打包构建
-        uses: actions/setup-node@master
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v4
         with:
-          node-version: "20.x" # 指定需要的node版本
-      - run: npm install
-      - run: npm run build
+          node-version: "20.x"
 
-    # 部署到阿里云OSS（替换COS部署）
-      - name: 部署到阿里云OSS
+      - name: 安装依赖
+        run: npm install
+
+      - name: 打包构建
+        run: npm run build
+
+      - name: 部署到阿里云 OSS
         uses: manyuanrong/ossutil@v3.0.0
-          with:
-          publish_branch: gh-pages # 部署分支
-          publish_dir: ./dist # 部署目录
-          # 阿里云访问凭证
+        with:
+          publish_branch: gh-pages # 部署分支（可自定义）
+          publish_dir: ./dist # 构建输出目录
           accessKeyId: ${{ secrets.ALY_SECRET_ID }}
           accessKeySecret: ${{ secrets.ALY_SECRET_KEY }}
-          # OSS配置
           endpoint: ${{ secrets.ALY_ENDPOINT }}
           bucket: ${{ secrets.ALY_BUCKET }}
-          clear: true
-          
-      - name: 部署成功，可访问域名
+          clear: true # 每次部署前清空 Bucket
+
+      - name: 部署成功提示
         run: |
           echo "🎉 部署成功！"
-          echo "🌐 网站访问地址：http://${{ secrets.OSS_BUCKET }}.${{ secrets.OSS_ENDPOINT }}"
-
+          echo "🌐 访问地址：http://${{ secrets.ALY_BUCKET }}.${{ secrets.ALY_ENDPOINT }}"
 
       # 部署到服务器
       # - name: Deploy to server
