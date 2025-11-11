@@ -3,60 +3,33 @@ name: Deploy # 部署名称
 on:
   push:
     branches:
-      - main
+      - main # 部署分支
     paths-ignore:
       - README.md # 忽略文件
-  pull_request:
-    branches:
-      - main
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest # 运行环境
-
     steps:
-      - name: 下载源代码
-        uses: actions/checkout@v4
+      # 下载源码，检出仓库并下载里面的代码到runner中，actions/checkout@v2是官方自己的轮子，开箱即用
+      - name: Checkout code
+        uses: actions/checkout@v2 # 检出代码
 
-      - name: 设置 Node.js 环境
-        uses: actions/setup-node@v4
+      # 打包构建
+      - name: Build
+        uses: actions/setup-node@master
         with:
-          node-version: "20.x"
-
-      - name: 安装依赖
-        run: npm install
-
-      - name: 打包构建
-        run: npm run build
-
-      - name: 部署到阿里云 OSS
-        uses: manyuanrong/setup-ossutil@v2.0
-        with:
-          publish_branch: gh-pages # 部署分支（可自定义）
-          publish_dir: ./dist # 构建输出目录
-          accessKeyId: ${{ secrets.ALY_SECRET_ID }}
-          accessKeySecret: ${{ secrets.ALY_SECRET_KEY }}
-          endpoint: ${{ secrets.ALY_ENDPOINT }}
-          bucket: ${{ secrets.ALY_BUCKET }}
-          clear: true # 每次部署前清空 Bucket
-
-      - name: 部署成功提示
-        run: |
-          echo "🎉 部署成功！"
-          echo "🌐 访问地址：http://${{ secrets.ALY_BUCKET }}.${{ secrets.ALY_ENDPOINT }}"
+          node-version: "20.x" # 指定需要的node版本
+      - run: npm install
+      - run: npm run build
 
       # 部署到服务器
-      # - name: Deploy to server
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     publish_branch: gh-pages # 部署分支
-      #     publish_dir: ./dist # 部署目录
-      #     github_token: ${{ secrets.CICD_DEMO }} # 令牌
-      #     user_name: ${{ secrets.MY_USERNAME }}
-      #     user_email: ${{ secrets.MY_EMAIL }}
-      #     commit_message: 自动部署
+      - name: Deploy to server
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          branch: gh-pages # 部署分支
+          publish_dir: ./dist # 部署目录
+          github_token: ${{ secrets.CICD_DEMO }} # 令牌
+          user_name: ${{ secrets.MY_USERNAME }}
+          user_email: ${{ secrets.MY_EMAIL }}
+          commit_message: '自动部署'
