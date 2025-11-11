@@ -7,13 +7,18 @@ on:
     paths-ignore:
       - README.md # 忽略文件
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest # 运行环境
     steps:
       # 下载源码，检出仓库并下载里面的代码到runner中，actions/checkout@v2是官方自己的轮子，开箱即用
       - name: Checkout code
-        uses: actions/checkout@v2 # 检出代码
+        uses: actions/checkout@v4 # 检出代码
 
       # 打包构建
       - name: Build
