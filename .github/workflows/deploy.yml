@@ -1,0 +1,30 @@
+name: Deploy # 部署名称
+
+on:
+  push:
+    branches: [main] # 部署分支
+    paths-ignore:
+      - README.md # 忽略文件
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # 运行环境
+    steps:
+      # 下载源码，检出仓库并下载里面的代码到runner中，actions/checkout@v2是官方自己的轮子，开箱即用
+      - name: Checkout code
+        uses: actions/checkout@v2 # 检出代码
+
+      # 打包构建
+      - name: Build
+        uses: actions/setup-node@master
+        with:
+          node-version: "20.x" # 指定需要的node版本
+      - run: npm install
+      - run: npm run build
+
+      # 部署到服务器
+      - name: Deploy to server
+        uses: peaceiris/actions-gh-pages@v3
+        with: 
+          branch: gh-pages # 部署分支
+          publish_dir: ./dist # 部署目录
