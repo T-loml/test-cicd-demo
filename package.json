@@ -1,5 +1,5 @@
 {
-  "homepage": "https://t-loml.github.io/github-actions-demo",
+  "hompPage": ".",
   "name": "test-cicd-demo",
   "private": true,
   "version": "0.0.0",
